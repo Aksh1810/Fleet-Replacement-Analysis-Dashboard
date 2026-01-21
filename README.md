@@ -2,6 +2,9 @@
 
 A modern, interactive web-based dashboard designed to analyze fleet vehicle data and provide actionable value-based recommendations for vehicle replacement.
 
+## 🌐 Live Demo
+**[Launch Dashboard](https://fleet-replacement-analysis-dashboar.vercel.app)**
+
 ## 🚀 Features
 
 -   **Interactive Dashboard**: Real-time visualization of fleet health, age distribution, and replacement priorities.
@@ -15,7 +18,7 @@ A modern, interactive web-based dashboard designed to analyze fleet vehicle data
         -   Department Analysis (Dynamic Bar)
         -   5-Year Replacement Timeline (Line)
         -   Cost-Benefit Analysis (Horizontal Bar)
--   **Simulation & Sample Data**: logic included to generate realistic sample data for demonstration.
+-   **Sample Data Standard**: The dashboard automatically loads a realistic 75-vehicle sample dataset on first load. You can always reset to this state with the "Load Sample" button.
 -   **Reporting**: Export filtered data to CSV or generate a printable PDF report directly from the browser.
 
 ## 🛠 Technologies Used
@@ -32,18 +35,17 @@ A modern, interactive web-based dashboard designed to analyze fleet vehicle data
 ├── style.css               # Custom styling and theming
 ├── sample_fleet_data.csv   # Sample dataset for testing
 ├── fleet_theme.json        # Theme configuration reference
-├── POWERBI_SETUP.md        # Legacy/Alternative setup guide
 └── README.md               # Project documentation
 ```
 
 ## 🔌 How to Use
 
-1.  **Open the Dashboard**: Simply double-click `index.html` to open it in any modern web browser.
-2.  **Explore Sample Data**: The dashboard loads with generated sample data by default.
+1.  **Open the Dashboard**: Visit the live demo link above or open `index.html` locally.
+2.  **Explore Default Data**: The dashboard initializes with a random sample of 75 vehicles.
 3.  **Import Your Data**:
     -   Click the **"📂 Import CSV"** button.
-    -   Select a CSV file containing vehicle data (ID, Make, Model, Year, Odometer, Cost/Dept).
-    -   The dashboard will automatically parse, normalize, and visualize your data.
+    -   Select a CSV file containing vehicle data. The dashboard supports standard headers (ID, Make, Model, Year, Odometer) and handles diverse formats.
+    -   *Reset Option*: Click **"🔄 Load Sample"** at any time to return to the sample dataset.
 4.  **Analyze & Act**:
     -   Use the filters (Department, Priority, Age) to narrow down the view.
     -   Review the "Recommendations" section for specific actions (e.g., "Immediate Action", "Short-Term Planning").
