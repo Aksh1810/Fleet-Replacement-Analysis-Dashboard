@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fleet Replacement Analysis Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Calibri', 'Segoe UI', sans-serif;
+            background: #e8f4ea;
+            padding: 15px;
+        }
+
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .title-bar {
+            background: linear-gradient(135deg, #1e5128 0%, #2d7a3e 100%);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 10px 10px 0 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .title-bar h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .title-bar .subtitle {
+            font-size: 16px;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        .main-content {
+            background: white;
+            padding: 0;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .control-panel {
+            background: #f8faf9;
+            padding: 20px 30px;
+            border-bottom: 2px solid #e0e7e3;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .control-panel label {
+            font-weight: 600;
+            color: #1e5128;
+            font-size: 14px;
+        }
+
+        .control-panel select,
+        .control-panel input {
+            padding: 8px 14px;
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .control-panel select:focus,
+        .control-panel input:focus {
+            outline: none;
+            border-color: #1e5128;
+        }
+
+        .btn {
+            padding: 9px 18px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #1e5128;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2d7a3e;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(30, 81, 40, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #1e5128;
+            border: 2px solid #1e5128;
+        }
+
+        .btn-secondary:hover {
+            background: #f0f7f2;
+        }
+
+        .kpi-section {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .kpi-card {
+            background: white;
+            padding: 24px;
+            border-radius: 10px;
+            border: 2px solid #e0e7e3;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #1e5128;
+        }
+
+        .kpi-card.warning::before {
+            background: #f59e0b;
+        }
+
+        .kpi-card.danger::before {
+            background: #dc2626;
+        }
+
+        .kpi-card.success::before {
+            background: #10b981;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .kpi-label {
+            font-size: 13px;
+            color: #6b7280;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .kpi-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1e5128;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .kpi-card.warning .kpi-value {
+            color: #d97706;
+        }
+
+        .kpi-card.danger .kpi-value {
+            color: #dc2626;
+        }
+
+        .kpi-card.success .kpi-value {
+            color: #059669;
+        }
+
+        .kpi-subtitle {
+            font-size: 13px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .kpi-change {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 6px;
+        }
+
+        .kpi-change.up {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .kpi-change.down {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .charts-section {
+            padding: 0 30px 30px 30px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 24px;
+            border-radius: 10px;
+            border: 2px solid #e0e7e3;
+            /* Ensure the card creates a positioning context and has layout stability */
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-card canvas {
+            max-height: 300px;
+            /* Constrain height to prevent infinite expansion loop */
+            width: 100% !important;
+        }
+
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f4f2;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e5128;
+        }
+
+        .chart-info {
+            font-size: 12px;
+            color: #6b7280;
+            background: #f3f4f6;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        .data-table-section {
+            padding: 0 30px 30px 30px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .table-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e5128;
+        }
+
+        .search-box {
+            padding: 8px 14px;
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 300px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #e0e7e3;
+        }
+
+        .data-table thead {
+            background: #1e5128;
+            color: white;
+        }
+
+        .data-table th {
+            padding: 14px 12px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .priority-high {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .priority-medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .priority-low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .priority-none {
+            background: #e5e7eb;
+            color: #4b5563;
+        }
+
+        .score-bar {
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .score-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .score-high {
+            background: #dc2626;
+        }
+
+        .score-medium {
+            background: #f59e0b;
+        }
+
+        .score-low {
+            background: #10b981;
+        }
+
+        .analysis-panel {
+            margin: 0 30px 30px 30px;
+            padding: 24px;
+            background: #fffbeb;
+            border: 2px solid #fbbf24;
+            border-radius: 10px;
+        }
+
+        .analysis-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .analysis-title::before {
+            content: '⚡';
+            font-size: 20px;
+        }
+
+        .analysis-content {
+            color: #78350f;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .recommendations {
+            margin: 0 30px 30px 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .recommendation-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #1e5128;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .recommendation-card h3 {
+            font-size: 16px;
+            color: #1e5128;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .recommendation-card p {
+            font-size: 14px;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 1200px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .control-panel {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <div class="title-bar">
+            <h1> Fleet Vehicle Replacement Analysis Dashboard</h1>
+            <div class="subtitle">Saskatchewan Ministry of SaskBuilds & Procurement | Central Vehicle Agency</div>
+        </div>
+
+        <div class="main-content">
+            <div class="control-panel">
+                <div>
+                    <label>Department:</label>
+                    <select id="deptFilter">
+                        <option value="all">All Departments</option>
+                        <option value="Health">Health</option>
+                        <option value="Education">Education</option>
+                        <option value="Transportation">Transportation</option>
+                        <option value="Environment">Environment</option>
+                        <option value="Justice">Justice</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Priority Level:</label>
+                    <select id="priorityFilter">
+                        <option value="all">All Priorities</option>
+                        <option value="High">High Priority</option>
+                        <option value="Medium">Medium Priority</option>
+                        <option value="Low">Low Priority</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Min Age (years):</label>
+                    <input type="number" id="ageFilter" min="0" max="20" value="0" style="width: 80px;">
+                </div>
+
+                <div style="margin-left: auto; display: flex; gap: 10px;">
+                    <button class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
+                    <button class="btn btn-primary" onclick="exportToCSV()">📊 Export Data</button>
+                    <button class="btn btn-primary" onclick="generateReport()">📄 Generate Report</button>
+                </div>
+            </div>
+
+            <div class="kpi-section">
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Fleet Size</div>
+                    <div class="kpi-value" id="totalVehicles">75</div>
+                    <div class="kpi-subtitle">Active vehicles</div>
+                </div>
+
+                <div class="kpi-card danger">
+                    <div class="kpi-label">High Priority Replacements</div>
+                    <div class="kpi-value" id="highPriority">18</div>
+                    <div class="kpi-subtitle">Immediate action needed</div>
+                    <div class="kpi-change up">↑ Critical</div>
+                </div>
+
+                <div class="kpi-card warning">
+                    <div class="kpi-label">Medium Priority</div>
+                    <div class="kpi-value" id="mediumPriority">23</div>
+                    <div class="kpi-subtitle">Review within 12 months</div>
+                </div>
+
+                <div class="kpi-card success">
+                    <div class="kpi-label">Low Priority</div>
+                    <div class="kpi-value" id="lowPriority">34</div>
+                    <div class="kpi-subtitle">Good condition</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-label">Average Vehicle Age</div>
+                    <div class="kpi-value" id="avgAge">6.2</div>
+                    <div class="kpi-subtitle">years</div>
+                </div>
+
+                <div class="kpi-card warning">
+                    <div class="kpi-label">Estimated Replacement Cost</div>
+                    <div class="kpi-value" id="replacementCost">$810K</div>
+                    <div class="kpi-subtitle">For high priority vehicles</div>
+                </div>
+            </div>
+
+            <div class="analysis-panel">
+                <div class="analysis-title">Key Insights & Analysis</div>
+                <div class="analysis-content" id="keyInsights">
+                    <strong>Critical Finding:</strong> 24% of the fleet (18 vehicles) requires immediate replacement
+                    based on age, mileage, and maintenance cost analysis.
+                    Priority vehicles average 9.4 years old with 198,000 km, significantly exceeding recommended service
+                    life thresholds.
+                    Delaying replacements could result in estimated additional maintenance costs of $42,000 annually.
+                </div>
+            </div>
+
+            <div class="charts-section">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Replacement Priority Distribution</div>
+                        <div class="chart-info">By vehicle count</div>
+                    </div>
+                    <canvas id="priorityChart"></canvas>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">Age vs. Replacement Score</div>
+                    <canvas id="scatterChart"></canvas>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">Department Analysis</div>
+                    <canvas id="deptChart"></canvas>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">5-Year Replacement Timeline</div>
+                    <canvas id="timelineChart"></canvas>
+                </div>
+
+                <div class="chart-card full-width">
+                    <div class="chart-title">Cost-Benefit Analysis: Replace vs. Maintain</div>
+                    <canvas id="costBenefitChart"></canvas>
+                </div>
+            </div>
+
+            <div class="recommendations">
+                <div class="recommendation-card">
+                    <h3>💰 Immediate Action (Q1 2026)</h3>
+                    <p>Replace 11 vehicles with replacement scores above 80. Estimated cost: $495K. Annual maintenance
+                        savings: $34K.</p>
+                </div>
+
+                <div class="recommendation-card">
+                    <h3>📅 Short-Term Planning (2026-27)</h3>
+                    <p>Budget for 7 medium-priority vehicles. Stagger replacements across fiscal quarters to manage cash
+                        flow.</p>
+                </div>
+
+                <div class="recommendation-card">
+                    <h3>🔍 Optimization Study</h3>
+                    <p>Analyze utilization rates across departments. Potential 5-8% fleet reduction through better
+                        allocation.</p>
+                </div>
+
+                <div class="recommendation-card">
+                    <h3>🛠️ Enhanced Maintenance</h3>
+                    <p>Implement preventative program for 23 vehicles at risk. Investment: $12K/year. Savings:
+                        $28K/year.</p>
+                </div>
+            </div>
+
+            <div class="data-table-section">
+                <div class="table-header">
+                    <div class="table-title">Detailed Vehicle Replacement Analysis</div>
+                    <input type="text" class="search-box" id="searchBox"
+                        placeholder="Search by Vehicle ID, Make, or Model...">
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Vehicle ID</th>
+                            <th>Dept</th>
+                            <th>Make/Model</th>
+                            <th>Year</th>
+                            <th>Age</th>
+                            <th>Odometer</th>
+                            <th>Monthly Cost</th>
+                            <th>Score</th>
+                            <th>Priority</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Generate comprehensive fleet data
+        const departments = ['Health', 'Education', 'Transportation', 'Environment', 'Justice'];
+        const makes = ['Ford', 'Chevrolet', 'Dodge', 'Toyota', 'Honda', 'Nissan'];
+        const models = {
+            'Ford': ['F-150', 'Explorer', 'Transit', 'Escape', 'Edge'],
+            'Chevrolet': ['Silverado', 'Tahoe', 'Equinox', 'Malibu', 'Traverse'],
+            'Dodge': ['Ram 1500', 'Durango', 'Charger', 'Grand Caravan'],
+            'Toyota': ['Tacoma', 'RAV4', 'Camry', 'Highlander', 'Tundra'],
+            'Honda': ['CR-V', 'Accord', 'Pilot', 'Civic', 'Odyssey'],
+            'Nissan': ['Frontier', 'Rogue', 'Altima', 'Pathfinder']
+        };
+
+        let fleetData = [];
+
+        // Generate realistic fleet data
+        for (let i = 1; i <= 75; i++) {
+            const dept = departments[Math.floor(Math.random() * departments.length)];
+            const make = makes[Math.floor(Math.random() * makes.length)];
+            const model = models[make][Math.floor(Math.random() * models[make].length)];
+            const year = 2012 + Math.floor(Math.random() * 13);
+            const age = 2026 - year;
+            const odometer = Math.floor(15000 + (age * 18000) + (Math.random() * 40000));
+
+            // Calculate costs with realistic factors
+            const baseCost = 300 + Math.floor(Math.random() * 200);
+            const ageFactor = Math.pow(1.08, Math.max(0, age - 5));
+            const mileageFactor = odometer > 200000 ? 1.5 : odometer > 150000 ? 1.25 : 1.0;
+            const monthlyCost = Math.round(baseCost * ageFactor * mileageFactor);
+
+            // Calculate replacement score (0-100)
+            const ageScore = Math.min(40, (age / 12) * 40);
+            const mileageScore = Math.min(30, (odometer / 250000) * 30);
+            const costScore = Math.min(30, ((monthlyCost - 300) / 700) * 30);
+            const replacementScore = Math.round(ageScore + mileageScore + costScore);
+
+            // Determine priority
+            let priority = 'Low';
+            if (replacementScore >= 70) priority = 'High';
+            else if (replacementScore >= 50) priority = 'Medium';
+
+            // Recommended action
+            let action = 'Monitor';
+            if (replacementScore >= 80) action = 'Replace Immediately';
+            else if (replacementScore >= 70) action = 'Replace in 6-12 months';
+            else if (replacementScore >= 50) action = 'Plan for replacement';
+
+            fleetData.push({
+                id: `CVA-${String(i).padStart(3, '0')}`,
+                dept,
+                make,
+                model,
+                year,
+                age,
+                odometer,
+                monthlyCost,
+                replacementScore,
+                priority,
+                action
+            });
+        }
+
+        // Sort by replacement score (highest first)
+        fleetData.sort((a, b) => b.replacementScore - a.replacementScore);
+
+        let filteredData = [...fleetData];
+
+        // Update KPIs
+        function updateKPIs() {
+            const high = filteredData.filter(v => v.priority === 'High').length;
+            const medium = filteredData.filter(v => v.priority === 'Medium').length;
+            const low = filteredData.filter(v => v.priority === 'Low').length;
+            const avgAge = (filteredData.reduce((sum, v) => sum + v.age, 0) / filteredData.length).toFixed(1);
+            const replacementCost = high * 45000;
+
+            document.getElementById('totalVehicles').textContent = filteredData.length;
+            document.getElementById('highPriority').textContent = high;
+            document.getElementById('mediumPriority').textContent = medium;
+            document.getElementById('lowPriority').textContent = low;
+            document.getElementById('avgAge').textContent = avgAge;
+            document.getElementById('replacementCost').textContent = `$${Math.round(replacementCost / 1000)}K`;
+        }
+
+        // Populate table
+        function populateTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            filteredData.forEach(vehicle => {
+                const row = document.createElement('tr');
+
+                const scoreClass = vehicle.replacementScore >= 70 ? 'score-high' :
+                    vehicle.replacementScore >= 50 ? 'score-medium' : 'score-low';
+
+                const priorityClass = vehicle.priority === 'High' ? 'priority-high' :
+                    vehicle.priority === 'Medium' ? 'priority-medium' : 'priority-low';
+
+                row.innerHTML = `
+                    <td><strong>${vehicle.id}</strong></td>
+                    <td>${vehicle.dept}</td>
+                    <td>${vehicle.make} ${vehicle.model}</td>
+                    <td>${vehicle.year}</td>
+                    <td>${vehicle.age} yrs</td>
+                    <td>${vehicle.odometer.toLocaleString()} km</td>
+                    <td>$${vehicle.monthlyCost}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <strong>${vehicle.replacementScore}</strong>
+                            <div class="score-bar" style="width: 60px;">
+                                <div class="score-fill ${scoreClass}" style="width: ${vehicle.replacementScore}%"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="priority-badge ${priorityClass}">${vehicle.priority}</span></td>
+                    <td style="font-size: 13px; color: #4b5563;">${vehicle.action}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Filter functions
+        function applyFilters() {
+            const deptFilter = document.getElementById('deptFilter').value;
+            const priorityFilter = document.getElementById('priorityFilter').value;
+            const ageFilter = parseInt(document.getElementById('ageFilter').value) || 0;
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+
+            filteredData = fleetData.filter(v => {
+                const deptMatch = deptFilter === 'all' || v.dept === deptFilter;
+                const priorityMatch = priorityFilter === 'all' || v.priority === priorityFilter;
+                const ageMatch = v.age >= ageFilter;
+                const searchMatch = searchTerm === '' ||
+                    v.id.toLowerCase().includes(searchTerm) ||
+                    v.make.toLowerCase().includes(searchTerm) ||
+                    v.model.toLowerCase().includes(searchTerm);
+
+                return deptMatch && priorityMatch && ageMatch && searchMatch;
+            });
+
+            updateKPIs();
+            populateTable();
+            updateCharts();
+        }
+
+        function resetFilters() {
+            document.getElementById('deptFilter').value = 'all';
+            document.getElementById('priorityFilter').value = 'all';
+            document.getElementById('ageFilter').value = '0';
+            document.getElementById('searchBox').value = '';
+            applyFilters();
+        }
+
+        // Event listeners
+        document.getElementById('deptFilter').addEventListener('change', applyFilters);
+        document.getElementById('priorityFilter').addEventListener('change', applyFilters);
+        document.getElementById('ageFilter').addEventListener('input', applyFilters);
+        document.getElementById('searchBox').addEventListener('input', applyFilters);
+
+        // Chart configurations
+        let charts = {};
+
+        // Shared options to disable animations (stops "expanding" effect)
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            transitions: {
+                active: {
+                    animation: {
+                        duration: 0
+                    }
+                }
+            }
+        };
+
+        function createCharts() {
+            // Priority Distribution
+            const priorityCounts = {
+                'High': filteredData.filter(v => v.priority === 'High').length,
+                'Medium': filteredData.filter(v => v.priority === 'Medium').length,
+                'Low': filteredData.filter(v => v.priority === 'Low').length
+            };
+
+            charts.priority = new Chart(document.getElementById('priorityChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['High Priority', 'Medium Priority', 'Low Priority'],
+                    datasets: [{
+                        data: Object.values(priorityCounts),
+                        backgroundColor: ['#dc2626', '#f59e0b', '#10b981'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            // Scatter plot: Age vs Score
+            charts.scatter = new Chart(document.getElementById('scatterChart'), {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Vehicles',
+                        data: filteredData.map(v => ({ x: v.age, y: v.replacementScore })),
+                        backgroundColor: filteredData.map(v =>
+                            v.priority === 'High' ? '#dc2626' :
+                                v.priority === 'Medium' ? '#f59e0b' : '#10b981'
+                        )
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        x: { title: { display: true, text: 'Vehicle Age (years)' } },
+                        y: { title: { display: true, text: 'Replacement Score' } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // Department Analysis Chart
+            const deptCounts = {};
+            departments.forEach(d => deptCounts[d] = 0);
+            filteredData.forEach(v => {
+                if (deptCounts[v.dept] !== undefined) deptCounts[v.dept]++;
+            });
+
+            charts.dept = new Chart(document.getElementById('deptChart'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(deptCounts),
+                    datasets: [{
+                        label: 'Vehicles per Department',
+                        data: Object.values(deptCounts),
+                        backgroundColor: '#1e5128',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            // Timeline Chart (Simpler UI, No Animation)
+            const currentYear = 2026;
+            const projectionYears = [currentYear, currentYear + 1, currentYear + 2, currentYear + 3, currentYear + 4];
+
+            const cumulativeNeeds = projectionYears.map(year => {
+                return filteredData.filter(v => (v.year + 12) <= year).length;
+            });
+
+            charts.timeline = new Chart(document.getElementById('timelineChart'), {
+                type: 'line',
+                data: {
+                    labels: projectionYears,
+                    datasets: [{
+                        label: 'Replacements Needed',
+                        data: cumulativeNeeds,
+                        borderColor: '#1e5128',
+                        backgroundColor: 'rgba(30, 81, 40, 0.1)',
+                        fill: true,
+                        tension: 0, // Straight lines, no curves to calculate
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#1e5128',
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f3f4f6' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // Cost Benefit Chart (Simpler UI, No Animation)
+            const totalMaint = filteredData.reduce((sum, v) => sum + v.monthlyCost, 0) * 12;
+            const estimatedNewMaint = filteredData.length * 300 * 12; // lower maintenance for new cars
+            const replacementCost = filteredData.filter(v => v.priority === 'High').length * 45000;
+            const potentialSavings = totalMaint - estimatedNewMaint;
+
+            charts.costBenefit = new Chart(document.getElementById('costBenefitChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Current Maint.', 'New Fleet Maint.', 'Est. Savings', 'Replacement Cost'],
+                    datasets: [{
+                        label: 'Cost ($)',
+                        data: [totalMaint, estimatedNewMaint, potentialSavings, replacementCost],
+                        backgroundColor: [
+                            '#dc2626',   // Red
+                            '#10b981',  // Green
+                            '#3b82f6',   // Blue
+                            '#f59e0b'    // Orange
+                        ],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    indexAxis: 'y',
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: '#f3f4f6' },
+                            ticks: {
+                                callback: function (value) { return '$' + (value / 1000) + 'k'; }
+                            }
+                        },
+                        y: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateCharts() {
+            // Destroy existing charts to update
+            if (charts.priority) charts.priority.destroy();
+            if (charts.scatter) charts.scatter.destroy();
+            if (charts.dept) charts.dept.destroy();
+            if (charts.timeline) charts.timeline.destroy();
+            if (charts.costBenefit) charts.costBenefit.destroy();
+
+            createCharts();
+        }
+
+        function exportToCSV() {
+            const csv = Papa.unparse(filteredData);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "fleet_analysis_data.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function generateReport() {
+            window.print();
+        }
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', () => {
+            updateKPIs();
+            populateTable();
+            createCharts();
+        });
+    </script>
+</body>
+
+</html>

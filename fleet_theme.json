@@ -1,0 +1,88 @@
+{
+    "name": "Fleet Analysis Theme",
+    "dataColors": [
+        "#1e5128",
+        "#2d7a3e",
+        "#dc2626",
+        "#f59e0b",
+        "#10b981",
+        "#6b7280",
+        "#92400e",
+        "#065f46"
+    ],
+    "background": "#e8f4ea",
+    "foreground": "#1e5128",
+    "tableAccent": "#1e5128",
+    "visualStyles": {
+        "*": {
+            "*": {
+                "*": [
+                    {
+                        "responsive": true
+                    }
+                ],
+                "title": [
+                    {
+                        "show": true,
+                        "fontColor": {
+                            "solid": {
+                                "color": "#1e5128"
+                            }
+                        },
+                        "fontSize": 14,
+                        "fontFamily": "Segoe UI Bold"
+                    }
+                ],
+                "background": [
+                    {
+                        "show": true,
+                        "color": {
+                            "solid": {
+                                "color": "#FFFFFF"
+                            }
+                        },
+                        "transparency": 0
+                    }
+                ],
+                "border": [
+                    {
+                        "show": true,
+                        "color": {
+                            "solid": {
+                                "color": "#e0e7e3"
+                            }
+                        },
+                        "radius": 10
+                    }
+                ],
+                "dropShadow": [
+                    {
+                        "show": true,
+                        "color": {
+                            "solid": {
+                                "color": "#000000"
+                            }
+                        },
+                        "position": "Outer",
+                        "transparency": 90,
+                        "blur": 4
+                    }
+                ]
+            }
+        },
+        "page": {
+            "*": {
+                "background": [
+                    {
+                        "color": {
+                            "solid": {
+                                "color": "#e8f4ea"
+                            }
+                        },
+                        "transparency": 0
+                    }
+                ]
+            }
+        }
+    }
+}
