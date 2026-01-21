@@ -22,13 +22,11 @@ def generate_data():
         dept = random.choice(DEPARTMENTS)
         make = random.choice(MAKES)
         model = random.choice(MODELS[make])
-        # Year between 2012 and 2024 (JS was 2012 + random(13))
         year = 2012 + math.floor(random.random() * 13) 
         current_year = 2026
         age = current_year - year
         
         # Odometer logic
-        # 15000 + (age * 18000) + random(40000)
         odometer = math.floor(15000 + (age * 18000) + (random.random() * 40000))
         
         # Costs
@@ -38,11 +36,8 @@ def generate_data():
         monthly_cost = round(base_cost * age_factor * mileage_factor)
         
         # Replacement Score (0-100)
-        # Age Score: min(40, (age / 12) * 40)
         age_score = min(40, (age / 12) * 40)
-        # Mileage Score: min(30, (odometer / 250000) * 30)
         mileage_score = min(30, (odometer / 250000) * 30)
-        # Cost Score: min(30, ((monthly_cost - 300) / 700) * 30)
         cost_score = min(30, ((monthly_cost - 300) / 700) * 30)
         
         replacement_score = round(age_score + mileage_score + cost_score)
