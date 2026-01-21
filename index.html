@@ -262,12 +262,43 @@
             const avgAge = (filteredData.reduce((sum, v) => sum + v.age, 0) / filteredData.length).toFixed(1);
             const replacementCost = high * 45000;
 
+            // Dynamic Key Insights
+            function updateInsights() {
+                const highPriority = filteredData.filter(v => v.priority === 'High');
+                const highCount = highPriority.length;
+                const totalCount = filteredData.length;
+                const percent = totalCount > 0 ? Math.round((highCount / totalCount) * 100) : 0;
+
+                let insightHTML = '';
+
+                if (highCount > 0) {
+                    const avgAgeHigh = (highPriority.reduce((sum, v) => sum + v.age, 0) / highCount).toFixed(1);
+                    const costAvoidance = (highCount * 3000).toLocaleString(); // Assumption: $3k/year extra cost per overdue vehicle
+
+                    insightHTML = `
+                        <strong>Critical Finding:</strong> ${percent}% of the fleet (${highCount} vehicles) requires immediate replacement. 
+                        Priority vehicles average ${avgAgeHigh} years old. 
+                        Delaying replacements could result in estimated additional maintenance costs of $${costAvoidance} annually.
+                    `;
+                } else {
+                    insightHTML = `
+                        <strong>Status:</strong> The current fleet is in good condition. 
+                        No vehicles currently require immediate replacement based on the selected criteria.
+                        Continue routine maintenance schedules.
+                    `;
+                }
+
+                document.getElementById('keyInsights').innerHTML = insightHTML;
+            }
+
             document.getElementById('totalVehicles').textContent = filteredData.length;
             document.getElementById('highPriority').textContent = high;
             document.getElementById('mediumPriority').textContent = medium;
             document.getElementById('lowPriority').textContent = low;
             document.getElementById('avgAge').textContent = avgAge;
             document.getElementById('replacementCost').textContent = `$${Math.round(replacementCost / 1000)}K`;
+
+            updateInsights(); // Call the new function
         }
 
         // Populate table
