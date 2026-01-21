@@ -1,0 +1,76 @@
+Vehicle ID,Department,Make,Model,Year,Age,Odometer,Monthly Cost,Replacement Score,Priority,Recommended Action
+CVA-001,Education,Toyota,Highlander,2016,10,225362,1058,90,High,Replace Immediately
+CVA-002,Education,Nissan,Frontier,2013,13,250397,1088,100,High,Replace Immediately
+CVA-003,Environment,Toyota,Highlander,2023,3,102489,357,25,Low,Monitor
+CVA-004,Transportation,Toyota,Tundra,2017,9,190912,590,65,Medium,Plan for replacement
+CVA-005,Justice,Toyota,Highlander,2024,2,66104,498,23,Low,Monitor
+CVA-006,Transportation,Ford,Escape,2017,9,209582,702,72,High,Replace in 6-12 months
+CVA-007,Health,Toyota,Highlander,2017,9,192224,743,72,High,Replace in 6-12 months
+CVA-008,Health,Chevrolet,Traverse,2012,14,269038,1322,100,High,Replace Immediately
+CVA-009,Health,Dodge,Durango,2022,4,119393,467,35,Low,Monitor
+CVA-010,Health,Chevrolet,Equinox,2012,14,287975,1424,100,High,Replace Immediately
+CVA-011,Environment,Nissan,Pathfinder,2017,9,208150,1002,85,High,Replace Immediately
+CVA-012,Transportation,Ford,Explorer,2016,10,214426,1025,89,High,Replace Immediately
+CVA-013,Education,Honda,Pilot,2014,12,241421,892,94,High,Replace Immediately
+CVA-014,Justice,Chevrolet,Malibu,2024,2,56958,443,20,Low,Monitor
+CVA-015,Transportation,Dodge,Ram 1500,2021,5,118657,468,38,Low,Monitor
+CVA-016,Justice,Ford,Edge,2016,10,213362,882,84,High,Replace Immediately
+CVA-017,Education,Honda,Odyssey,2021,5,131574,380,36,Low,Monitor
+CVA-018,Transportation,Toyota,Camry,2019,7,176461,602,57,Medium,Plan for replacement
+CVA-019,Education,Toyota,Highlander,2019,7,173630,660,60,Medium,Plan for replacement
+CVA-020,Environment,Honda,Pilot,2024,2,52648,425,18,Low,Monitor
+CVA-021,Environment,Honda,Civic,2017,9,210065,882,80,High,Replace Immediately
+CVA-022,Environment,Honda,Civic,2018,8,196562,677,66,Medium,Plan for replacement
+CVA-023,Education,Dodge,Charger,2022,4,100298,362,28,Low,Monitor
+CVA-024,Transportation,Dodge,Grand Caravan,2018,8,181472,524,58,Medium,Plan for replacement
+CVA-025,Environment,Honda,Pilot,2012,14,280032,1325,100,High,Replace Immediately
+CVA-026,Transportation,Dodge,Durango,2021,5,135913,403,37,Low,Monitor
+CVA-027,Education,Dodge,Durango,2023,3,103965,428,28,Low,Monitor
+CVA-028,Transportation,Chevrolet,Tahoe,2015,11,227257,1002,94,High,Replace Immediately
+CVA-029,Transportation,Toyota,Highlander,2024,2,86465,470,24,Low,Monitor
+CVA-030,Justice,Toyota,RAV4,2023,3,88777,424,26,Low,Monitor
+CVA-031,Health,Ford,Transit,2013,13,250033,1119,100,High,Replace Immediately
+CVA-032,Health,Chevrolet,Silverado,2018,8,181356,559,60,Medium,Plan for replacement
+CVA-033,Environment,Nissan,Pathfinder,2020,6,146203,494,46,Low,Monitor
+CVA-034,Justice,Chevrolet,Tahoe,2024,2,54080,476,21,Low,Monitor
+CVA-035,Justice,Chevrolet,Tahoe,2015,11,220083,1145,93,High,Replace Immediately
+CVA-036,Environment,Chevrolet,Tahoe,2021,5,115724,389,34,Low,Monitor
+CVA-037,Health,Nissan,Frontier,2014,12,269684,979,99,High,Replace Immediately
+CVA-038,Justice,Nissan,Pathfinder,2019,7,169709,611,57,Medium,Plan for replacement
+CVA-039,Health,Honda,Civic,2024,2,57050,376,17,Low,Monitor
+CVA-040,Transportation,Dodge,Grand Caravan,2016,10,226582,897,86,High,Replace Immediately
+CVA-041,Justice,Ford,Escape,2016,10,232358,1018,91,High,Replace Immediately
+CVA-042,Transportation,Nissan,Rogue,2017,9,208802,963,83,High,Replace Immediately
+CVA-043,Health,Ford,Explorer,2021,5,111773,314,31,Low,Monitor
+CVA-044,Health,Toyota,Tacoma,2021,5,108093,327,31,Low,Monitor
+CVA-045,Education,Nissan,Rogue,2024,2,84598,499,25,Low,Monitor
+CVA-046,Transportation,Toyota,Highlander,2014,12,268062,1193,100,High,Replace Immediately
+CVA-047,Environment,Ford,F-150,2018,8,178254,669,64,Medium,Plan for replacement
+CVA-048,Transportation,Ford,Edge,2014,12,269951,931,97,High,Replace Immediately
+CVA-049,Health,Nissan,Pathfinder,2012,14,282434,1274,100,High,Replace Immediately
+CVA-050,Justice,Ford,Escape,2013,13,251429,1347,100,High,Replace Immediately
+CVA-051,Health,Ford,Transit,2024,2,78436,472,23,Low,Monitor
+CVA-052,Justice,Nissan,Altima,2013,13,267594,1058,100,High,Replace Immediately
+CVA-053,Justice,Chevrolet,Equinox,2021,5,120570,336,33,Low,Monitor
+CVA-054,Transportation,Chevrolet,Silverado,2020,6,136853,443,43,Low,Monitor
+CVA-055,Health,Honda,Civic,2012,14,285698,1187,100,High,Replace Immediately
+CVA-056,Health,Honda,Odyssey,2020,6,147166,360,40,Low,Monitor
+CVA-057,Transportation,Nissan,Altima,2013,13,278339,861,94,High,Replace Immediately
+CVA-058,Justice,Honda,Accord,2015,11,251940,1128,97,High,Replace Immediately
+CVA-059,Transportation,Nissan,Altima,2022,4,108731,368,29,Low,Monitor
+CVA-060,Education,Chevrolet,Equinox,2020,6,141981,499,46,Low,Monitor
+CVA-061,Transportation,Ford,Explorer,2020,6,155093,580,51,Medium,Plan for replacement
+CVA-062,Environment,Chevrolet,Traverse,2019,7,173486,491,52,Medium,Plan for replacement
+CVA-063,Education,Nissan,Altima,2015,11,246869,1043,96,High,Replace Imme23diately
+CVA-064,Transportation,Toyota,Camry,2019,7,143650,532,51,Medium,Plan for replacement
+CVA-065,Education,Chevrolet,Silverado,2016,10,208504,838,81,High,Replace Immediately
+CVA-066,Justice,Chevrolet,Silverado,2023,3,79385,416,24,Low,Monitor
+CVA-067,Health,Dodge,Ram 1500,2024,2,88895,303,17,Low,Monitor
+CVA-068,Transportation,Honda,CR-V,2013,13,264992,1086,100,High,Replace Immediately
+CVA-069,Health,Toyota,Camry,2013,13,287686,936,97,High,Replace Immediately
+CVA-070,Education,Honda,Accord,2018,8,169753,745,66,Medium,Plan for replacement
+CVA-071,Environment,Ford,F-150,2015,11,220558,809,85,High,Replace Immediately
+CVA-072,Health,Dodge,Ram 1500,2015,11,222040,926,90,High,Replace Immediately
+CVA-073,Justice,Ford,Explorer,2024,2,71222,365,18,Low,Monitor
+CVA-074,Justice,Honda,Odyssey,2016,10,227489,979,90,High,Replace Immediately
+CVA-075,Transportation,Honda,Pilot,2016,10,201663,822,80,High,Replace Immediately
