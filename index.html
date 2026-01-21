@@ -46,10 +46,61 @@
                     <input type="number" id="ageFilter" min="0" max="20" value="0" style="width: 80px;">
                 </div>
 
+                <!-- New Data Upload Control -->
+                <div>
+                    <label>Source Data:</label>
+                    <input type="file" id="csvUpload" accept=".csv" style="display: none;">
+                    <button class="btn btn-secondary" onclick="document.getElementById('csvUpload').click()">
+                        📂 Import CSV
+                    </button>
+                </div>
+
                 <div style="margin-left: auto; display: flex; gap: 10px;">
                     <button class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
                     <button class="btn btn-primary" onclick="exportToCSV()">📊 Export Data</button>
                     <button class="btn btn-primary" onclick="generateReport()">📄 Generate Report</button>
+                </div>
+            </div>
+
+            <!-- New Scenario Analysis Section -->
+            <div class="scenario-panel"
+                style="padding: 20px 40px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 30px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div
+                        style="background: #e0e7ff; color: #3730a3; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 13px;">
+                        ⚡ SIMULATION MODE
+                    </div>
+                </div>
+
+                <div class="scenario-control" style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <label style="font-size: 12px; font-weight: 600; color: #475569;">RETIREMENT AGE
+                            THRESHOLD</label>
+                        <span id="retireAgeVal" style="font-size: 12px; font-weight: 700; color: #1e5128;">10
+                            Years</span>
+                    </div>
+                    <input type="range" id="simRetireAge" min="5" max="20" value="10" step="1"
+                        style="width: 100%; accent-color: #1e5128;">
+                </div>
+
+                <div class="scenario-control" style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <label style="font-size: 12px; font-weight: 600; color: #475569;">MAINTENANCE COST
+                            TRIGGER</label>
+                        <span id="maintCostVal"
+                            style="font-size: 12px; font-weight: 700; color: #1e5128;">>$1,200/mo</span>
+                    </div>
+                    <input type="range" id="simMaintCost" min="500" max="3000" value="1200" step="100"
+                        style="width: 100%; accent-color: #1e5128;">
+                </div>
+
+                <div class="scenario-control" style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <label style="font-size: 12px; font-weight: 600; color: #475569;">INFLATION RATE</label>
+                        <span id="inflationVal" style="font-size: 12px; font-weight: 700; color: #1e5128;">3%</span>
+                    </div>
+                    <input type="range" id="simInflation" min="0" max="10" value="3" step="0.5"
+                        style="width: 100%; accent-color: #1e5128;">
                 </div>
             </div>
 
@@ -201,53 +252,77 @@
         };
 
         let fleetData = [];
+        let simParams = {
+            retireAge: 10,
+            maintThreshold: 1200,
+            inflationRate: 3
+        };
 
         // Generate realistic fleet data
-        for (let i = 1; i <= 75; i++) {
-            const dept = departments[Math.floor(Math.random() * departments.length)];
-            const make = makes[Math.floor(Math.random() * makes.length)];
-            const model = models[make][Math.floor(Math.random() * models[make].length)];
-            const year = 2012 + Math.floor(Math.random() * 13);
-            const age = 2026 - year;
-            const odometer = Math.floor(15000 + (age * 18000) + (Math.random() * 40000));
+        function generateInitialData() {
+            fleetData = [];
+            for (let i = 1; i <= 75; i++) {
+                const dept = departments[Math.floor(Math.random() * departments.length)];
+                const make = makes[Math.floor(Math.random() * makes.length)];
+                const model = models[make][Math.floor(Math.random() * models[make].length)];
+                const year = 2012 + Math.floor(Math.random() * 13);
+                const age = 2026 - year;
+                const odometer = Math.floor(15000 + (age * 18000) + (Math.random() * 40000));
 
-            // Calculate costs with realistic factors
-            const baseCost = 300 + Math.floor(Math.random() * 200);
-            const ageFactor = Math.pow(1.08, Math.max(0, age - 5));
-            const mileageFactor = odometer > 200000 ? 1.5 : odometer > 150000 ? 1.25 : 1.0;
-            const monthlyCost = Math.round(baseCost * ageFactor * mileageFactor);
+                // Calculate costs with realistic factors
+                const baseCost = 300 + Math.floor(Math.random() * 200);
+                const ageFactor = Math.pow(1.08, Math.max(0, age - 5));
+                const mileageFactor = odometer > 200000 ? 1.5 : odometer > 150000 ? 1.25 : 1.0;
+                const monthlyCost = Math.round(baseCost * ageFactor * mileageFactor);
 
-            // Calculate replacement score (0-100)
-            const ageScore = Math.min(40, (age / 12) * 40);
-            const mileageScore = Math.min(30, (odometer / 250000) * 30);
-            const costScore = Math.min(30, ((monthlyCost - 300) / 700) * 30);
-            const replacementScore = Math.round(ageScore + mileageScore + costScore);
+                fleetData.push({
+                    id: `CVA-${String(i).padStart(3, '0')}`,
+                    dept,
+                    make,
+                    model,
+                    year,
+                    age,
+                    odometer,
+                    monthlyCost
+                });
+            }
+            recalculateScores();
+        }
 
-            // Determine priority
-            let priority = 'Low';
-            if (replacementScore >= 70) priority = 'High';
-            else if (replacementScore >= 50) priority = 'Medium';
+        function recalculateScores() {
+            fleetData.forEach(vehicle => {
+                // Calculate replacement score (0-100)
+                // Logic based on simParams
 
-            // Recommended action
-            let action = 'Monitor';
-            if (replacementScore >= 80) action = 'Replace Immediately';
-            else if (replacementScore >= 70) action = 'Replace in 6-12 months';
-            else if (replacementScore >= 50) action = 'Plan for replacement';
+                // Age Score: 40 points if age >= retireAge
+                const ageScore = Math.min(40, (vehicle.age / simParams.retireAge) * 40);
 
-            fleetData.push({
-                id: `CVA-${String(i).padStart(3, '0')}`,
-                dept,
-                make,
-                model,
-                year,
-                age,
-                odometer,
-                monthlyCost,
-                replacementScore,
-                priority,
-                action
+                // Mileage Score: 30 points (Standardize around 250k)
+                const mileageScore = Math.min(30, (vehicle.odometer / 250000) * 30);
+
+                // Cost Score: 30 points if cost >= maintThreshold
+                const costScore = Math.min(30, (vehicle.monthlyCost / simParams.maintThreshold) * 30);
+
+                const replacementScore = Math.round(ageScore + mileageScore + costScore);
+
+                vehicle.replacementScore = replacementScore;
+
+                // Determine priority
+                let priority = 'Low';
+                if (replacementScore >= 70) priority = 'High';
+                else if (replacementScore >= 50) priority = 'Medium';
+                vehicle.priority = priority;
+
+                // Recommended action
+                let action = 'Monitor';
+                if (replacementScore >= 80) action = 'Replace Immediately';
+                else if (replacementScore >= 70) action = 'Replace in 6-12 months';
+                else if (replacementScore >= 50) action = 'Plan for replacement';
+                vehicle.action = action;
             });
         }
+
+        generateInitialData();
 
         // Sort by replacement score (highest first)
         fleetData.sort((a, b) => b.replacementScore - a.replacementScore);
@@ -376,6 +451,81 @@
         document.getElementById('ageFilter').addEventListener('input', applyFilters);
         document.getElementById('searchBox').addEventListener('input', applyFilters);
 
+        // Scenario Listeners
+        document.getElementById('simRetireAge').addEventListener('input', (e) => {
+            document.getElementById('retireAgeVal').textContent = `${e.target.value} Years`;
+            simParams.retireAge = parseInt(e.target.value);
+            updateSimulation();
+        });
+        document.getElementById('simMaintCost').addEventListener('input', (e) => {
+            document.getElementById('maintCostVal').textContent = `>$${parseInt(e.target.value).toLocaleString()}/mo`;
+            simParams.maintThreshold = parseInt(e.target.value);
+            updateSimulation();
+        });
+        document.getElementById('simInflation').addEventListener('input', (e) => {
+            document.getElementById('inflationVal').textContent = `${e.target.value}%`;
+            simParams.inflationRate = parseFloat(e.target.value);
+            updateSimulation();
+        });
+
+        // File Upload Handler
+        document.getElementById('csvUpload').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            Papa.parse(file, {
+                header: true,
+                dynamicTyping: true,
+                complete: function (results) {
+                    if (results.data && results.data.length > 0) {
+                        // Map CSV to our structure if needed, or assume matching headers
+                        // We expect: Vehicle ID, Dept, Make, Model, Year, Odometer, Monthly Cost
+                        // We clean the keys to match strict expectations or fuzzy match
+
+                        const newData = results.data.map(row => {
+                            // Basic normalization - assumes user provides reasonably matching CSV
+                            // If they use the Exported CSV from this tool, it will match.
+                            // If not, we might get undefineds. For a demo, we assume "Happy Path" or the exported format.
+                            if (!row['Vehicle ID']) return null; // Skip empty rows
+
+                            return {
+                                id: row['Vehicle ID'] || row['id'] || 'UNK',
+                                dept: row['Dept'] || row['Department'] || 'General',
+                                make: row['Make/Model'] ? row['Make/Model'].split(' ')[0] : (row['Make'] || 'Unknown'),
+                                model: row['Make/Model'] ? row['Make/Model'].split(' ').slice(1).join(' ') : (row['Model'] || 'Vehicle'),
+                                year: row['Year'] || 2020,
+                                age: row['Age'] || (2026 - (row['Year'] || 2020)),
+                                odometer: row['Odometer'] || 0,
+                                monthlyCost: parseCost(row['Monthly Cost'])
+                            };
+                        }).filter(x => x !== null);
+
+                        if (newData.length > 0) {
+                            fleetData = newData;
+                            recalculateScores();
+                            // Re-sort
+                            fleetData.sort((a, b) => b.replacementScore - a.replacementScore);
+                            resetFilters(); // This triggers applyFilters -> updateCharts
+                            alert(`Successfully imported ${newData.length} vehicles!`);
+                        }
+                    }
+                }
+            });
+        });
+
+        function parseCost(costStr) {
+            if (typeof costStr === 'number') return costStr;
+            if (!costStr) return 0;
+            return parseFloat(costStr.replace(/[^0-9.-]+/g, ""));
+        }
+
+        function updateSimulation() {
+            recalculateScores();
+            // Re-sort
+            fleetData.sort((a, b) => b.replacementScore - a.replacementScore);
+            applyFilters();
+        }
+
         // Chart configurations
         let charts = {};
 
@@ -474,8 +624,10 @@
             const currentYear = 2026;
             const projectionYears = [currentYear, currentYear + 1, currentYear + 2, currentYear + 3, currentYear + 4];
 
-            const cumulativeNeeds = projectionYears.map(year => {
-                return filteredData.filter(v => (v.year + 12) <= year).length;
+            const cumulativeNeeds = projectionYears.map((year, i) => {
+                // Calculate future needs based on the retirement age parameter
+                // We add 'i' to simulated future age of the vehicle
+                return filteredData.filter(v => (v.age + i) >= simParams.retireAge).length;
             });
 
             charts.timeline = new Chart(document.getElementById('timelineChart'), {
