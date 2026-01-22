@@ -32,6 +32,7 @@ A modern, interactive web-based dashboard designed to analyze fleet vehicle data
 
 ```
 ├── index.html              # Main application entry point
+├── script.js               # Application logic and interactivity
 ├── style.css               # Custom styling and theming
 ├── sample_fleet_data.csv   # Sample dataset for testing
 ├── fleet_theme.json        # Theme configuration reference
