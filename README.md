@@ -1,9 +1,9 @@
-# Fleet Vehicle Replacement Analysis Dashboard
+# FleetIQ | Fleet Replacement Analysis Dashboard
 
 A modern, interactive web-based dashboard designed to analyze fleet vehicle data and provide actionable value-based recommendations for vehicle replacement.
 
 ## 🌐 Live Demo
-**[Launch Dashboard](https://fleet-replacement-analysis-dashboar.vercel.app)**
+**[Launch FleetIQ Dashboard](https://fleet-replacement-analysis-dashboar.vercel.app)**
 
 ## 🚀 Features
 
